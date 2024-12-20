@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>Property.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #1750eb;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Property.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.hmsapp.entity;</span>
+
+<span class="s0">import </span><span class="s1">jakarta.persistence.*;</span>
+<span class="s0">import </span><span class="s1">lombok.Getter;</span>
+<span class="s0">import </span><span class="s1">lombok.Setter;</span>
+
+<span class="s1">@Getter</span>
+<span class="s1">@Setter</span>
+<span class="s1">@Entity</span>
+<span class="s1">@Table(name = </span><span class="s2">&quot;properties&quot;</span><span class="s1">)</span>
+<span class="s0">public class </span><span class="s1">Property {</span>
+    <span class="s1">@Id</span>
+    <span class="s1">@GeneratedValue(strategy = GenerationType.IDENTITY)</span>
+    <span class="s1">@Column(name = </span><span class="s2">&quot;id&quot;</span><span class="s1">, nullable = </span><span class="s0">false</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">Long id;</span>
+
+    <span class="s1">@Column(name = </span><span class="s2">&quot;name&quot;</span><span class="s1">, nullable = </span><span class="s0">false</span><span class="s1">, length = </span><span class="s3">100</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">String name;</span>
+
+    <span class="s1">@Column(name = </span><span class="s2">&quot;no_of_guest&quot;</span><span class="s1">, nullable = </span><span class="s0">false</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">Integer noOfGuest;</span>
+
+    <span class="s1">@Column(name = </span><span class="s2">&quot;no_of_bedrooms&quot;</span><span class="s1">, nullable = </span><span class="s0">false</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">Integer noOfBedrooms;</span>
+
+    <span class="s1">@Column(name = </span><span class="s2">&quot;no_of_bathrooms&quot;</span><span class="s1">, nullable = </span><span class="s0">false</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">Integer noOfBathrooms;</span>
+
+    <span class="s1">@ManyToOne</span>
+    <span class="s1">@JoinColumn(name = </span><span class="s2">&quot;country_id&quot;</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">Country country;</span>
+
+    <span class="s1">@ManyToOne</span>
+    <span class="s1">@JoinColumn(name = </span><span class="s2">&quot;city_id&quot;</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">City city;</span>
+
+<span class="s1">}</span></pre>
+</body>
+</html>

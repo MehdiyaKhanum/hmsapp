@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>SecurityConfig.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #8c8c8c; font-style: italic;}
+.s3 { color: #067d17;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+SecurityConfig.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.hmsapp.config;</span>
+
+<span class="s0">import </span><span class="s1">com.hmsapp.service.JWTService;</span>
+<span class="s0">import </span><span class="s1">org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="s0">import </span><span class="s1">org.springframework.context.annotation.Bean;</span>
+<span class="s0">import </span><span class="s1">org.springframework.context.annotation.Configuration;</span>
+<span class="s0">import </span><span class="s1">org.springframework.http.HttpStatus;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.config.annotation.web.builders.HttpSecurity;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.web.SecurityFilterChain;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.web.authentication.AuthenticationFilter;</span>
+
+<span class="s1">@Configuration</span>
+<span class="s1">@EnableWebSecurity</span>
+<span class="s0">public class </span><span class="s1">SecurityConfig {</span>
+
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">JwtFilter jwtFilter;</span>
+
+    <span class="s1">@Bean</span>
+    <span class="s0">public </span><span class="s1">SecurityFilterChain securityFilterChain(HttpSecurity http) </span><span class="s0">throws </span><span class="s1">Exception {</span>
+        <span class="s2">//h(cd)2</span>
+        <span class="s1">http.csrf().disable().cors().disable();</span>
+        <span class="s1">http.addFilterBefore(jwtFilter, AuthenticationFilter.</span><span class="s0">class</span><span class="s1">);</span>
+<span class="s2">//      haap</span>
+        <span class="s1">http.authorizeHttpRequests().anyRequest().permitAll();</span>
+
+        <span class="s1">http.authorizeRequests()</span>
+                <span class="s1">.requestMatchers(</span><span class="s3">&quot;/api/auth/sign-up&quot;</span><span class="s1">, </span><span class="s3">&quot;/api/auth/login&quot;</span><span class="s1">, </span><span class="s3">&quot;/api/auth/property/sign-up&quot;</span><span class="s1">)</span>
+                <span class="s1">.permitAll()</span>
+                <span class="s1">.requestMatchers(</span><span class="s3">&quot;/api/v1/property/addProperty&quot;</span><span class="s1">)</span>
+                <span class="s1">.hasRole(</span><span class="s3">&quot;OWNER&quot;</span><span class="s1">)</span>
+                <span class="s1">.requestMatchers(</span><span class="s3">&quot;/api/v1/property/deleteProperty&quot;</span><span class="s1">)</span>
+                <span class="s1">.hasAnyRole(</span><span class="s3">&quot;OWNER&quot;</span><span class="s1">,</span><span class="s3">&quot;ADMIN&quot;</span><span class="s1">)</span>
+                <span class="s1">.requestMatchers(</span><span class="s3">&quot;/api/auth/blog/sign-up&quot;</span><span class="s1">)</span>
+                <span class="s1">.hasRole(</span><span class="s3">&quot;ADMIN&quot;</span><span class="s1">)</span>
+                <span class="s1">.anyRequest().authenticated()</span>
+        <span class="s1">;</span>
+        <span class="s0">return </span><span class="s1">http.build();</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>

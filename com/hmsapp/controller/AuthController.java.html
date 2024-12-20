@@ -1,0 +1,128 @@
+<html>
+<head>
+<title>AuthController.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #8c8c8c; font-style: italic;}
+.s4 { color: #1750eb;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+AuthController.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.hmsapp.controller;</span>
+
+<span class="s0">import </span><span class="s1">com.hmsapp.entity.User;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.payload.JwtToken;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.payload.LoginDto;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.repository.UserRepository;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.service.UserService;</span>
+<span class="s0">import </span><span class="s1">org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="s0">import </span><span class="s1">org.springframework.http.HttpStatus;</span>
+<span class="s0">import </span><span class="s1">org.springframework.http.ResponseEntity;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.crypto.bcrypt.BCrypt;</span>
+<span class="s0">import </span><span class="s1">org.springframework.web.bind.annotation.*;</span>
+
+<span class="s0">import </span><span class="s1">java.util.Optional;</span>
+
+<span class="s1">@RestController</span>
+<span class="s1">@RequestMapping(</span><span class="s2">&quot;/api/auth&quot;</span><span class="s1">)</span>
+
+<span class="s0">public class </span><span class="s1">AuthController {</span>
+    <span class="s0">private </span><span class="s1">UserRepository userRepository;</span>
+    <span class="s0">private </span><span class="s1">UserService userService;</span>
+
+    <span class="s0">public </span><span class="s1">AuthController(UserRepository userRepository, UserService userService) {</span>
+        <span class="s0">this</span><span class="s1">.userRepository = userRepository;</span>
+        <span class="s0">this</span><span class="s1">.userService = userService;</span>
+    <span class="s1">}</span>
+
+    <span class="s3">//Use for user sign-up</span>
+    <span class="s1">@PostMapping(</span><span class="s2">&quot;/sign-up&quot;</span><span class="s1">)</span>
+    <span class="s0">public </span><span class="s1">ResponseEntity&lt;?&gt; createUser(</span>
+            <span class="s1">@RequestBody User user</span>
+    <span class="s1">){</span>
+        <span class="s1">Optional&lt;User&gt; opUsername = userRepository.findByUsername(user.getEmail());</span>
+        <span class="s0">if</span><span class="s1">(opUsername.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Username already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opEmail = userRepository.findByEmail(user.getUsername());</span>
+        <span class="s0">if</span><span class="s1">(opEmail.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Email already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opMobile = userRepository.findByMobile(user.getMobile());</span>
+        <span class="s0">if</span><span class="s1">(opMobile.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Mobile already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(</span><span class="s4">10</span><span class="s1">)));</span>
+        <span class="s1">user.setRole(</span><span class="s2">&quot;ROLE_USER&quot;</span><span class="s1">);</span>
+        <span class="s1">User savedUser = userRepository.save(user);</span>
+        <span class="s0">return new </span><span class="s1">ResponseEntity&lt;&gt;(savedUser, HttpStatus.CREATED);</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@PostMapping(</span><span class="s2">&quot;/property/sign-up&quot;</span><span class="s1">)</span>
+    <span class="s0">public </span><span class="s1">ResponseEntity&lt;?&gt; createPropertyOwnerAccount(</span>
+            <span class="s1">@RequestBody User user</span>
+    <span class="s1">){</span>
+        <span class="s1">Optional&lt;User&gt; opUsername = userRepository.findByUsername(user.getEmail());</span>
+        <span class="s0">if</span><span class="s1">(opUsername.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Username already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opEmail = userRepository.findByEmail(user.getUsername());</span>
+        <span class="s0">if</span><span class="s1">(opEmail.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Email already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opMobile = userRepository.findByMobile(user.getMobile());</span>
+        <span class="s0">if</span><span class="s1">(opMobile.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Mobile already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(</span><span class="s4">10</span><span class="s1">)));</span>
+        <span class="s1">user.setRole(</span><span class="s2">&quot;ROLE_OWNER&quot;</span><span class="s1">);</span>
+        <span class="s1">User savedUser = userRepository.save(user);</span>
+        <span class="s0">return new </span><span class="s1">ResponseEntity&lt;&gt;(savedUser, HttpStatus.CREATED);</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@PostMapping(</span><span class="s2">&quot;/blog/sign-up&quot;</span><span class="s1">)</span>
+    <span class="s0">public </span><span class="s1">ResponseEntity&lt;?&gt; createBlogManagerAccount(</span>
+            <span class="s1">@RequestBody User user</span>
+    <span class="s1">){</span>
+        <span class="s1">Optional&lt;User&gt; opUsername = userRepository.findByUsername(user.getEmail());</span>
+        <span class="s0">if</span><span class="s1">(opUsername.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Username already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opEmail = userRepository.findByEmail(user.getUsername());</span>
+        <span class="s0">if</span><span class="s1">(opEmail.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Email already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">Optional&lt;User&gt; opMobile = userRepository.findByMobile(user.getMobile());</span>
+        <span class="s0">if</span><span class="s1">(opMobile.isPresent()){</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity(</span><span class="s2">&quot;Mobile already exists&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        <span class="s1">}</span>
+        <span class="s1">user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(</span><span class="s4">10</span><span class="s1">)));</span>
+        <span class="s1">user.setRole(</span><span class="s2">&quot;ROLE_BLOGMANAGER&quot;</span><span class="s1">);</span>
+        <span class="s1">User savedUser = userRepository.save(user);</span>
+        <span class="s0">return new </span><span class="s1">ResponseEntity&lt;&gt;(savedUser, HttpStatus.CREATED);</span>
+    <span class="s1">}</span>
+
+
+    <span class="s1">@PostMapping(</span><span class="s2">&quot;/login&quot;</span><span class="s1">)</span>
+    <span class="s0">public </span><span class="s1">ResponseEntity&lt;?&gt; login(@RequestBody LoginDto loginDto) {</span>
+        <span class="s1">String token = userService.verifyLogin(loginDto);</span>
+        <span class="s1">JwtToken jwtToken = </span><span class="s0">new </span><span class="s1">JwtToken();</span>
+        <span class="s1">jwtToken.setToken(token);</span>
+        <span class="s1">jwtToken.setType(</span><span class="s2">&quot;JWT&quot;</span><span class="s1">);</span>
+        <span class="s0">if </span><span class="s1">(token!=</span><span class="s0">null</span><span class="s1">) {</span>
+            <span class="s0">return new </span><span class="s1">ResponseEntity&lt;&gt;(jwtToken, HttpStatus.OK);</span>
+        <span class="s1">}</span>
+        <span class="s0">return new </span><span class="s1">ResponseEntity&lt;&gt;(</span><span class="s2">&quot;invalid&quot;</span><span class="s1">, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

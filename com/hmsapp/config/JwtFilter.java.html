@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>JwtFilter.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #1750eb;}
+.s4 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+JwtFilter.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.hmsapp.config;</span>
+
+<span class="s0">import </span><span class="s1">com.hmsapp.entity.User;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.repository.UserRepository;</span>
+<span class="s0">import </span><span class="s1">com.hmsapp.service.JWTService;</span>
+<span class="s0">import </span><span class="s1">jakarta.servlet.FilterChain;</span>
+<span class="s0">import </span><span class="s1">jakarta.servlet.ServletException;</span>
+<span class="s0">import </span><span class="s1">jakarta.servlet.http.HttpServletRequest;</span>
+<span class="s0">import </span><span class="s1">jakarta.servlet.http.HttpServletResponse;</span>
+<span class="s0">import </span><span class="s1">org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.authentication.UsernamePasswordAuthenticationToken;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.core.authority.SimpleGrantedAuthority;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.core.context.SecurityContextHolder;</span>
+<span class="s0">import </span><span class="s1">org.springframework.security.web.authentication.WebAuthenticationDetails;</span>
+<span class="s0">import </span><span class="s1">org.springframework.stereotype.Component;</span>
+<span class="s0">import </span><span class="s1">org.springframework.web.filter.OncePerRequestFilter;</span>
+
+<span class="s0">import </span><span class="s1">java.io.IOException;</span>
+<span class="s0">import </span><span class="s1">java.util.Collections;</span>
+<span class="s0">import </span><span class="s1">java.util.Optional;</span>
+
+<span class="s1">@Component</span>
+<span class="s0">public class </span><span class="s1">JwtFilter </span><span class="s0">extends </span><span class="s1">OncePerRequestFilter {</span>
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">JWTService jwtService;</span>
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">UserRepository userRepository;</span>
+
+    <span class="s0">public </span><span class="s1">JwtFilter(JWTService jwtService, UserRepository userRepository) {</span>
+        <span class="s0">this</span><span class="s1">.jwtService = jwtService;</span>
+        <span class="s0">this</span><span class="s1">.userRepository = userRepository;</span>
+    <span class="s1">}</span>
+    <span class="s1">@Override</span>
+    <span class="s0">protected void </span><span class="s1">doFilterInternal(HttpServletRequest request,</span>
+                                    <span class="s1">HttpServletResponse response,</span>
+                                    <span class="s1">FilterChain filterChain) </span><span class="s0">throws </span><span class="s1">ServletException, IOException {</span>
+        <span class="s1">String token = request.getHeader(</span><span class="s2">&quot;Authorization&quot;</span><span class="s1">);</span>
+
+        <span class="s0">if </span><span class="s1">(token!=</span><span class="s0">null </span><span class="s1">&amp;&amp; token.startsWith(</span><span class="s2">&quot;Bearer &quot;</span><span class="s1">)){</span>
+            <span class="s1">String jwtToken = token.substring(</span><span class="s3">8</span><span class="s1">,token.length() - </span><span class="s3">1</span><span class="s1">);</span>
+            <span class="s1">String username = jwtService.getUsername(jwtToken);</span>
+            <span class="s1">Optional&lt;User&gt; opUser = userRepository.findByUsername(username);</span>
+
+            <span class="s0">if </span><span class="s1">(opUser.isPresent()) {</span>
+                <span class="s1">User user = opUser.get();</span>
+                <span class="s1">UsernamePasswordAuthenticationToken authenticationToken = </span><span class="s0">new</span>
+                        <span class="s1">UsernamePasswordAuthenticationToken(user, </span><span class="s0">null</span><span class="s1">, Collections.singleton(</span><span class="s0">new </span><span class="s1">SimpleGrantedAuthority(user.getRole()))); </span><span class="s4">//remove null value and add role</span>
+                <span class="s1">authenticationToken.setDetails(</span><span class="s0">new </span><span class="s1">WebAuthenticationDetails(request));</span>
+
+                <span class="s1">SecurityContextHolder.getContext().setAuthentication(authenticationToken);  </span><span class="s4">//SGS</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s1">filterChain.doFilter(request,response);</span>
+    <span class="s1">}</span>
+
+<span class="s1">}</span></pre>
+</body>
+</html>

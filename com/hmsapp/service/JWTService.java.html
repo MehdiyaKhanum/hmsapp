@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>JWTService.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+JWTService.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.hmsapp.service;</span>
+
+<span class="s0">import </span><span class="s1">com.auth0.jwt.JWT;</span>
+<span class="s0">import </span><span class="s1">com.auth0.jwt.algorithms.Algorithm;</span>
+<span class="s0">import </span><span class="s1">com.auth0.jwt.interfaces.DecodedJWT;</span>
+<span class="s0">import </span><span class="s1">jakarta.annotation.PostConstruct;</span>
+<span class="s0">import </span><span class="s1">org.springframework.beans.factory.annotation.Value;</span>
+<span class="s0">import </span><span class="s1">org.springframework.stereotype.Service;</span>
+
+<span class="s0">import </span><span class="s1">java.io.UnsupportedEncodingException;</span>
+<span class="s0">import </span><span class="s1">java.util.Date;</span>
+
+<span class="s1">@Service</span>
+<span class="s0">public class </span><span class="s1">JWTService {</span>
+    <span class="s1">@Value(</span><span class="s2">&quot;${jwt.algorithm.key}&quot;</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">String algorithmKey;</span>
+
+    <span class="s1">@Value(</span><span class="s2">&quot;${jwt.issuer}&quot;</span><span class="s1">)</span>
+    <span class="s0">private </span><span class="s1">String issuer;</span>
+
+    <span class="s1">@Value(</span><span class="s2">&quot;${jwt.expiry.duration}&quot;</span><span class="s1">)</span>
+    <span class="s0">private int </span><span class="s1">expiry;</span>
+
+    <span class="s0">private </span><span class="s1">Algorithm algorithm;</span>
+
+    <span class="s1">@PostConstruct</span>
+    <span class="s0">public void </span><span class="s1">postConstruct() </span><span class="s0">throws </span><span class="s1">UnsupportedEncodingException {</span>
+        <span class="s1">algorithm = Algorithm.HMAC256(algorithmKey);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String generateToken(String username){</span>
+        <span class="s0">return </span><span class="s1">JWT.create()</span>
+                <span class="s3">//CEIS = Computer Engineer is always unemployees</span>
+                <span class="s1">.withClaim(</span><span class="s2">&quot;name&quot;</span><span class="s1">, username)</span>
+                <span class="s1">.withExpiresAt(</span><span class="s0">new </span><span class="s1">Date(System.currentTimeMillis() + expiry))</span>
+                <span class="s1">.withIssuer(issuer)</span>
+                <span class="s1">.sign(algorithm);</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getUsername(String token) {</span>
+        <span class="s1">DecodedJWT decodedJWT = JWT.require(algorithm)</span>
+                <span class="s1">.withIssuer(issuer)</span>
+                <span class="s1">.build()</span>
+                <span class="s1">.verify(token);</span>
+
+        <span class="s0">return </span><span class="s1">decodedJWT.getClaim(</span><span class="s2">&quot;name&quot;</span><span class="s1">).asString();</span>
+    <span class="s1">}</span>
+<span class="s1">}</span></pre>
+</body>
+</html>
